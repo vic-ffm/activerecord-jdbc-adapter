@@ -446,7 +446,15 @@ module ::ArJdbc
       if sql =~ /^\s*insert\s+into\s+([^\(\s,]+)\s*|^\s*update\s+([^\(\s,]+)\s*/i
         $1
       elsif sql =~ /from\s+([^\(\s,]+)\s*/i
-        $1
+        # It's possible to select from a function, in which case there is no table name
+        # StockSoftware has decided that we're going to require that all fn's begin with an 'fn' to allow us
+        # to recognise this
+        name = $1
+        if !name.split('.').empty? && name.split('.')[-1].start_with?('fn')
+          nil
+        else
+          name
+        end
       else
         nil
       end
